@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Welfare Scheme Feasibility Calculator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#f4f7f8;color:#17212b}
+.container{max-width:1180px;margin:auto;padding:24px 16px 60px}.hero{background:#145c4e;color:#fff;padding:28px;border-radius:18px;margin-bottom:18px}
+.hero h1{margin:0 0 7px;font-size:30px}.hero p{margin:0;opacity:.9;line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:#fff;border:1px solid #dbe3e8;border-radius:15px;padding:20px;margin-bottom:16px}.full{grid-column:1/-1}
+h2{font-size:18px;margin:0 0 16px}.desc{color:#64748b;font-size:13px;line-height:1.5;margin-top:-8px}
+label{font-size:13px;font-weight:650;display:block;margin-bottom:5px}.field{margin:12px 0}
+input{width:100%;padding:11px;border:1px solid #cbd5df;border-radius:8px;font-size:15px;outline:none}
+input:focus{border-color:#145c4e;box-shadow:0 0 0 3px #145c4e18}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.benefit{border:1px solid #e1e7eb;border-radius:10px;padding:13px;margin:9px 0;background:#fbfcfd}
+.benefit-title{font-weight:750;font-size:14px;margin-bottom:8px}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tabs{display:flex;gap:7px}.tabs button{border:1px solid #d5dfe4;background:#eef2f4;color:#17212b;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}.tabs button.active{background:#145c4e;color:#fff}
+.status{border-radius:12px;padding:17px;margin-bottom:14px}.status h3{margin:0 0 5px;font-size:24px}.status p{margin:0;line-height:1.5}.good{background:#eaf8f0;color:#087443;border:1px solid #b9e5ca}.warn{background:#fff7e5;color:#925700;border:1px solid #efd28e}.bad{background:#fff0ef;color:#b42318;border:1px solid #efb5b0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.metric{background:#f7f9fa;border:1px solid #e1e7eb;border-radius:10px;padding:12px}.metric span{display:block;color:#64748b;font-size:11px}.metric strong{display:block;font-size:18px;margin-top:4px}
+table{width:100%;border-collapse:collapse;margin-top:16px}th,td{padding:9px;border-bottom:1px solid #e4e9ed;font-size:13px;text-align:right}th:first-child,td:first-child{text-align:left}th{color:#64748b}
+.callout{margin-top:14px;padding:13px;background:#f6faf8;border-left:4px solid #145c4e;font-size:13px;line-height:1.55}.small{font-size:12px;color:#64748b;line-height:1.5}
+@media(max-width:780px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.metrics{grid-template-columns:1fr 1fr}.row,.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="hero">
+<h1>Welfare Scheme Feasibility Calculator</h1>
+<p>Test whether member contributions can sustainably fund welfare benefits, reserves and administration, while keeping retirement liabilities separate.</p>
+</div>
+
+<div class="grid">
+<div class="card">
+<h2>Membership & Contributions</h2>
+<div class="row">
+<div class="field"><label>Members</label><input id="members" type="number" value="1000" min="1" step="1"></div>
+<div class="field"><label>Monthly contribution (GH₵)</label><input id="contribution" type="number" value="18" min="0" step="0.01"></div>
+</div>
+<div class="row">
+<div class="field"><label>Starting fund (GH₵)</label><input id="startingFund" type="number" value="0" min="0" step="100"></div>
+<div class="field"><label>Membership growth (%/yr)</label><input id="growth" type="number" value="0" step="0.1"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Fund Management</h2>
+<div class="row">
+<div class="field"><label>Administration (% income)</label><input id="admin" type="number" value="10" min="0" step="0.1"></div>
+<div class="field"><label>Reserve allocation (% income)</label><input id="reserve" type="number" value="10" min="0" step="0.1"></div>
+</div>
+<div class="row">
+<div class="field"><label>Investment return (%/yr)</label><input id="investment" type="number" value="0" min="0" step="0.1"></div>
+<div class="field"><label>Other annual obligations (GH₵)</label><input id="other" type="number" value="0" min="0" step="100"></div>
+</div>
+</div>
+
+<div class="card full">
+<h2>Welfare Benefits</h2>
+<p class="desc">The incidence rate means the expected number of claims per 100 eligible members in one year.</p>
+
+<div class="benefit"><div class="benefit-title">Birth / Maternity</div><div class="two">
+<div><label>Annual incidence (%)</label><input id="birthRate" class="recalc" type="number" value="4" min="0" step="0.1"></div>
+<div><label>Average benefit (GH₵)</label><input id="birthBenefit" class="recalc" type="number" value="800" min="0" step="50"></div>
+</div></div>
+
+<div class="benefit"><div class="benefit-title">Bereavement / Death</div><div class="two">
+<div><label>Annual incidence (%)</label><input id="deathRate" class="recalc" type="number" value="0.5" min="0" step="0.01"></div>
+<div><label>Average benefit (GH₵)</label><input id="deathBenefit" class="recalc" type="number" value="800" min="0" step="50"></div>
+</div></div>
+
+<div class="benefit"><div class="benefit-title">Medical / Emergency</div><div class="two">
+<div><label>Annual incidence (%)</label><input id="medicalRate" class="recalc" type="number" value="8" min="0" step="0.1"></div>
+<div><label>Average benefit (GH₵)</label><input id="medicalBenefit" class="recalc" type="number" value="800" min="0" step="50"></div>
+</div></div>
+
+<div class="benefit"><div class="benefit-title">Marriage</div><div class="two">
+<div><label>Annual incidence (%)</label><input id="marriageRate" class="recalc" type="number" value="2" min="0" step="0.1"></div>
+<div><label>Average benefit (GH₵)</label><input id="marriageBenefit" class="recalc" type="number" value="800" min="0" step="50"></div>
+</div></div>
+
+<div class="benefit"><div class="benefit-title">Other Welfare</div><div class="two">
+<div><label>Annual incidence (%)</label><input id="otherRate" class="recalc" type="number" value="3" min="0" step="0.1"></div>
+<div><label>Average benefit (GH₵)</label><input id="otherBenefit" class="recalc" type="number" value="800" min="0" step="50"></div>
+</div></div>
+</div>
+
+<div class="card">
+<h2>Retirement at 60</h2>
+<p class="desc">This is displayed separately from the welfare funding ratio.</p>
+<div class="field"><label>Members retiring this year</label><input id="retirees" type="number" value="0" min="0" step="1"></div>
+<div class="field"><label>Retirement benefit per member (GH₵)</label><input id="retirementBenefit" type="number" value="20000" min="0" step="500"></div>
+</div>
+
+<div class="card">
+<h2>Scenario</h2>
+<p class="desc">Expected = entered rates. Conservative = +25% claims. Stress = +60% claims and +10% benefit size.</p>
+<div class="tabs">
+<button data-scenario="expected" class="active">Expected</button>
+<button data-scenario="conservative">Conservative</button>
+<button data-scenario="stress">Stress</button>
+</div>
+<p id="scenarioText" class="small" style="margin-top:12px"></p>
+</div>
+</div>
+
+<div class="card">
+<h2>Result</h2>
+<div id="result"></div>
+</div>
+
+<div class="card">
+<h2>Interpretation</h2>
+<div class="callout">
+<strong>Useful</strong> means the average welfare benefit is materially greater than the annual contribution per member.<br>
+<strong>Feasible</strong> means expected contribution income covers expected welfare claims, administration, reserve allocation and other obligations.<br>
+<strong>Funding ratio</strong> = annual contribution income ÷ annual welfare outgo. Below 1.00 indicates an expected annual deficit.<br>
+<strong>Retirement</strong> is reported separately because current welfare cash flow does not by itself prove that future retirement obligations are funded.
+</div>
+<p class="small">This is a planning model, not a formal actuarial valuation. For an actual scheme, replace assumed incidence rates with the scheme's historical experience and model retirement using the member age distribution, mortality, retirement probabilities, benefit rules and investment assumptions.</p>
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+let scenario="expected";
+
+function get(id){
+  const el=document.getElementById(id);
+  return el ? (parseFloat(el.value)||0) : 0;
+}
+function money(v){
+  return "GH₵ "+Number(v||0).toLocaleString("en-GH",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function calculate(){
+  const members=get("members");
+  const monthly=get("contribution");
+  const income=members*monthly*12;
+  const admin=income*get("admin")/100;
+  const reserve=income*get("reserve")/100;
+  const other=get("other");
+  const factor=scenario==="conservative"?1.25:scenario==="stress"?1.60:1;
+  const benefitFactor=scenario==="stress"?1.10:1;
+
+  const items=[
+    ["Birth / Maternity","birthRate","birthBenefit"],
+    ["Bereavement / Death","deathRate","deathBenefit"],
+    ["Medical / Emergency","medicalRate","medicalBenefit"],
+    ["Marriage","marriageRate","marriageBenefit"],
+    ["Other Welfare","otherRate","otherBenefit"]
+  ];
+
+  let claimCost=0;
+  let totalClaims=0;
+  let rows="";
+
+  items.forEach(function(item){
+    const rate=get(item[1])/100*factor;
+    const benefit=get(item[2])*benefitFactor;
+    const claims=members*rate;
+    const cost=claims*benefit;
+    totalClaims+=claims;
+    claimCost+=cost;
+    rows += "<tr><td>"+item[0]+"</td><td>"+(rate*100).toFixed(2)+"%</td><td>"+claims.toFixed(2)+"</td><td>"+money(benefit)+"</td><td>"+money(cost)+"</td></tr>";
+  });
+
+  const welfareOut=claimCost+admin+reserve+other;
+  const net=income-welfareOut;
+  const ratio=welfareOut>0?income/welfareOut:Infinity;
+
+  const retirees=get("retirees");
+  const retirementCost=retirees*get("retirementBenefit");
+  const investment=get("startingFund")*get("investment")/100;
+  const yearEnd=get("startingFund")+net-retirementCost+investment;
+
+  const annualContributionPerMember=monthly*12;
+  const usefulBenefits=items.some(item=>get(item[2])>annualContributionPerMember);
+
+  let status, cls;
+  if(ratio<1){status="NOT FEASIBLE";cls="bad";}
+  else if(ratio<1.10){status="FEASIBLE — LOW MARGIN";cls="warn";}
+  else{status="FEASIBLE";cls="good";}
+
+  if(!usefulBenefits) status+=" — LIMITED MEMBER VALUE";
+
+  const breakEvenCost=Math.max(0,income-admin-reserve-other);
+  const weightedClaimCostPerMember=members>0?claimCost/members:0;
+  const maxClaimRateFor800=(members>0 && get("birthBenefit")>0)?(breakEvenCost/(members*get("birthBenefit"))*100):0;
+
+  document.getElementById("result").innerHTML =
+    '<div class="status '+cls+'">'+
+      '<h3>'+status+'</h3>'+
+      '<p>Under the <strong>'+scenario+'</strong> scenario, the model expects '+money(claimCost)+' in welfare benefit payments against '+money(income)+' of annual member contributions.</p>'+
+    '</div>'+
+    '<div class="metrics">'+
+      '<div class="metric"><span>Annual contributions</span><strong>'+money(income)+'</strong></div>'+
+      '<div class="metric"><span>Expected welfare claims</span><strong>'+money(claimCost)+'</strong></div>'+
+      '<div class="metric"><span>Funding ratio</span><strong>'+(ratio===Infinity?"∞":ratio.toFixed(2))+'</strong></div>'+
+      '<div class="metric"><span>Annual welfare surplus</span><strong>'+money(net)+'</strong></div>'+
+    '</div>'+
+    '<table><thead><tr><th>Benefit</th><th>Rate</th><th>Claims</th><th>Avg. benefit</th><th>Expected cost</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody>'+
+    '<tfoot>'+
+      '<tr><td colspan="4">Administration</td><td>'+money(admin)+'</td></tr>'+
+      '<tr><td colspan="4">Reserve allocation</td><td>'+money(reserve)+'</td></tr>'+
+      '<tr><td colspan="4">Other obligations</td><td>'+money(other)+'</td></tr>'+
+      '<tr><td colspan="4"><strong>Total welfare outgo</strong></td><td><strong>'+money(welfareOut)+'</strong></td></tr>'+
+    '</tfoot></table>'+
+    '<div class="callout">'+
+      '<strong>Retirement:</strong> '+retirees+' member(s) × '+money(get("retirementBenefit"))+' = <strong>'+money(retirementCost)+'</strong> this year.<br>'+
+      '<strong>Projected year-end fund:</strong> '+money(yearEnd)+' (after the current-year welfare position, retirement payments and investment income).<br>'+
+      '<strong>Annual contribution per member:</strong> '+money(annualContributionPerMember)+'.<br>'+
+      '<strong>Total expected claims:</strong> '+totalClaims.toFixed(2)+' events/year.'+
+    '</div>';
+
+  document.getElementById("scenarioText").textContent =
+    scenario==="expected" ? "Using the entered best-estimate assumptions." :
+    scenario==="conservative" ? "Claim incidence increased by 25%." :
+    "Claim incidence increased by 60% and average benefits increased by 10%.";
+}
+
+document.querySelectorAll("input").forEach(function(input){
+  input.addEventListener("input",calculate);
+  input.addEventListener("change",calculate);
+});
+
+document.querySelectorAll("[data-scenario]").forEach(function(button){
+  button.addEventListener("click",function(){
+    scenario=this.getAttribute("data-scenario");
+    document.querySelectorAll("[data-scenario]").forEach(function(b){b.classList.remove("active");});
+    this.classList.add("active");
+    calculate();
+  });
+});
+
+calculate();
+})();
+</script>
+</body>
+</html>
